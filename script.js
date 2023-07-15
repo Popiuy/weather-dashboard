@@ -85,7 +85,7 @@ function fetchData(city) {
     city +
     "&units=imperial&appid=" +
     apiKey;
-  // Fetch call to pull city weather information and display
+  // Fetch call to pull city 5 day forecast information and display
   fetch(fApiURL)
     .then(function (response) {
       return response.json();
@@ -104,7 +104,7 @@ function fetchData(city) {
       return response.json();
     })
     .then(function (data) {
-      // renderForecastData(data);
+       renderData(data);
     })
     .catch(function (error) {
       console.log("Error:", error);
