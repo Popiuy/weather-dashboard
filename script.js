@@ -35,9 +35,8 @@ function getData() {
 
 // Generate button with the city from the array (searchHistory)
 function generateButtons() {
-  // var parentDiv = document.getElementById("buttonContainer");
   // // Clear current buttons (target parent div and clear information)(innerHTML)
-  // parentDiv.innerHTML = '';
+  
   // Loop over cities and generate elements onto the page
   for (var i = 0; i < cities.length; i++) {
     var city = cities[i];
