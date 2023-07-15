@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Dashboard</title>
+  <link rel="stylesheet" href="./styles.css"> 
+</head>
+<body>
+  <header>
+    <h1>Weather Dashboard</h1>
+  </header>
+  <main style="display: flex;">
+    <section>
+      <form id="form">
+        <input type="text" id="input" placeholder="Enter a city">
+        <button type="submit">Search</button>
+      </form>
+      <hr>
+      <div id="searchHistory" style="display: flex; flex-direction: column;">
+        
+      </div>
+    </section>
+    <section>
+
+      <div id="currentDay"></div>
+      <div id="fiveDayForecast">
+  
+      </div>
+    </section>
+    
+  </main>
+  <script src="./script.js"></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+</body>
+</html>

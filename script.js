@@ -1,88 +1,200 @@
-// acceptance criteria:
-// GIVEN a weather dashboard with form imputs
-// when i search for a city
-// THEN i am presented with current and future conditions for that city and that city is added to the search bar
-// Display current and current conditions, and then the city is added to the search history
+// Acceptance criteria:
+// GIVEN a weather dashboard with form inputs
+// WHEN I search for a city
+// THEN I am presented with current and future conditions for that city, and that city is added to the search history
+// WHEN I view current weather conditions for a city
+// THEN I am presented with the city name, date, and an icon representation of weather conditions
+// WHEN I view future weather conditions for a city
+// THEN I am presented with a 5-day forecast that displays the date and icon
+// WHEN I click on a city in the search history
+// THEN I am again presented with current and future conditions for that city
 
-// When i view a current weather conditions for that city
-// THEN i am presented with the city name, the date, an icon representation of weather conditions
+// Variable that saves the list of cities
+var cities = [];
 
-//when i view future weather conditions for that city
-//THEN i am presented with a 5 day forecast that displays the date, and icon,
+// Variable that stores an API key (this is not a standard practice)
+var apiKey = "7754a5a2cbeb38edf8762e417315fa20";
 
-// WHEN i click on a city in the search history
-// THEN i am again presented with current and future conditions for that city
+// Query selectors to append returned information
+var currentDay = document.querySelector("#currentDay");
+var searchHistory = document.querySelector("#searchHistory");
+var input = document.querySelector("#input");
+var form = document.querySelector("#form");
+var fiveDayForecast = document.querySelector("#fiveDayForecast");
 
-//HTML
-    //Header
-    //aside
-        //form
-            //title
-            // imput field
-            //search button
-        //div/section etc.
-            //append search info from imput field above
-        //div/container (can add classes for spacing)
-            //create multiple divs to allow for content to be appended
+// Function: gets the info from local storage and saves it to the array
+function getData() {
+  var storedCities = localStorage.getItem("searchHistory");
+  if (storedCities !== null) {
+    cities = JSON.parse(storedCities);
+  } else {
+    cities = [];
+  }
+  generateButtons()
+}
 
-//CSS
-    //can use framework/bootstrap
+// Generate button with the city from the array (searchHistory)
+function generateButtons() {
+  // var parentDiv = document.getElementById("buttonContainer");
+  // // Clear current buttons (target parent div and clear information)(innerHTML)
+  // parentDiv.innerHTML = '';
+  // Loop over cities and generate elements onto the page
+  for (var i = 0; i < cities.length; i++) {
+    var city = cities[i];
+    var button = document.createElement("button");
+    button.textContent = city;
+    button.addEventListener("click", function () {
+      var clickedCity = this.textContent;
+      fetchData(clickedCity);
+    });
+    searchHistory.appendChild(button);
+  }
+}
 
-//JS (most acceptance criteria done here)
-    // variable that saves the list of cities
-        //ex: var cities = []
+// Event listener that calls the function to display weather data
+form.addEventListener("submit", function (event) {
+  // Create a variable that holds the input
+  var searchInput = input.value.trim();
+  // Prevent default form submission behavior
+  event.preventDefault();
+  // Validate the text field has information
+  if (searchInput !== "") {
+    saveToCities(searchInput);
+    generateButtons();
+    fetchData(searchInput);
+  } else {
+    alert("Please enter a city");
+  }
+});
 
-    // variable that stores an api key (this is not a standard practice)
-        // ex: var apikey = ""
+// Save input data to the array and local storage
+function saveToCities(city) {
+  cities.push(city);
+  localStorage.setItem("searchHistory", JSON.stringify(cities));
+}
 
-    // query selectors to append return information
-        // ex: var currentDay
-        // ex: var searchHistory
-        // ex: var imput(for text field in the form)
-        // ex: var form (for the form itself)
-        // ex: var5DayForcast (where the forecast will be appeneded)
+// Fetch weather data from the API
+function fetchData(city) {
+  var fApiURL =
+    "https://api.openweathermap.org/data/2.5/forecast?q=" +
+    city +
+    "&units=imperial&appid=" +
+    apiKey;
 
-    // function:
-        // gets the info from local storage and saves it to the array
-            // check for data saved in the local storage (not null)
-                // localStorage.getItem
-                    // conditional statement to check for null
-                        //if null, do nothing (as there is nothing to create)
-                        // if data is stored. set global variable of searchHistory to include saved data
-                            // call generate button function
+  var apiURL =
+    "https://api.openweathermap.org/data/2.5/weather?q=" +
+    city +
+    "&units=imperial&appid=" +
+    apiKey;
+  // Fetch call to pull city weather information and display
+  fetch(fApiURL)
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+      renderForecastData(data);
+    })
+    .catch(function (error) {
+      console.log("Error:", error);
+    });
 
-        // generate button with the city from the array (searchHistory)
-            // clear current buttons (target parent div and clear information)(innerHTML)
-            // loop over cities, and generate elements onto the page
 
-        // needs event listener that calls the function to display weather data
-            // target the "search button"
-            // create a variable that holds the imput
-            // preventDefault()
-            // validate the text field has information
-                // conditiomal statement
-                    // if text is entered, pull and display weather data
-                    // if no text is entered, alert saying 'please enter a city'
-            // Save imput data to the array
-                // save to array defined earlier
-                    // arrayname.push (sends to the array)
-                    // save to local storage so that the information persists upon refresh
-                    // generateButton to re render the buttons on the aside
-                    // call fetch data function, pass the city searched to the fetch data function
-                    //
+  // Fetch call to pull city weather information and display
+  fetch(apiURL)
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+      // renderForecastData(data);
+    })
+    .catch(function (error) {
+      console.log("Error:", error);
+    });
 
-    // fetch call to pull city weather information and display
-        // create variable with API we are searching for
-            // fetch call with that API var to retrieve weather data
-        // create var long, var lat, var city
-            // create new URL using the above variables
-            // fetch call with API to retrieve the weather data
-            // call render data function (passing)
+}
 
-        // render data 
-            // create variable for temp, wind speed, humidity
-            // fetch call to retrieve icons
-            // append current conditions to the current div
-            // append future forecast
+// Render weather data
+function renderForecastData(data) {
+  console.log(data);
+  currentDay.innerHTML = "";
+  fiveDayForecast.innerHTML = "";
 
-    // function call to start the app
+  // Get the current weather conditions
+  var currentWeather = data.list[0];
+  var cityName = data.city.name;
+  var date = new Date(currentWeather.dt * 1000);
+  var currentDate = date.toLocaleDateString()
+  // var currentDate = moment.unix(currentWeather.dt).format("L");
+  // var forecastDate = moment.unix(forecastWeather.dt).format("L");
+  var iconURL =
+    "https://openweathermap.org/img/wn/" +
+    currentWeather.weather[0].icon +
+    "@2x.png";
+  var temperature = currentWeather.main.temp;
+  var windSpeed = currentWeather.wind.speed;
+  var humidity = currentWeather.main.humidity;
+
+  // Create elements for current weather
+  var cityNameEl = document.createElement("h2");
+  cityNameEl.textContent = cityName + " (" + currentDate + ")";
+
+  var weatherIconEl = document.createElement("img");
+  weatherIconEl.setAttribute("src", iconURL);
+
+  var temperatureEl = document.createElement("p");
+  temperatureEl.textContent = "Temperature: " + temperature + " °F";
+
+  var windSpeedEl = document.createElement("p");
+  windSpeedEl.textContent = "Wind Speed: " + windSpeed + " MPH";
+
+  var humidityEl = document.createElement("p");
+  humidityEl.textContent = "Humidity: " + humidity + "%";
+
+  // Append current weather elements
+  currentDay.append(cityNameEl, weatherIconEl, temperatureEl, windSpeedEl, humidityEl);
+  // currentDay.appendChild(weatherIconEl);
+  // currentDay.appendChild(temperatureEl);
+  // currentDay.appendChild(windSpeedEl);
+  // currentDay.appendChild(humidityEl);
+
+  // Get the 5-day forecast
+  for (var i = 1; i < data.list.length; i += 8) {
+    var forecastWeather = data.list[i];
+    var forecastDate = moment.unix(forecastWeather.dt).format("MM/DD/YYYY");
+    var forecastIconURL =
+      "https://openweathermap.org/img/wn/" +
+      forecastWeather.weather[0].icon +
+      "@2x.png";
+      
+      var fCityNameEl = document.createElement("h2");
+      fCityNameEl.textContent = cityName + " (" + currentDate + ")";
+    
+      var fWeatherIconEl = document.createElement("img");
+      fWeatherIconEl.setAttribute("src", iconURL);
+    
+      var fTemperatureEl = document.createElement("p");
+      fTemperatureEl.textContent = "Temperature: " + temperature + " °F";
+    
+      var fWindSpeedEl = document.createElement("p");
+      fWindSpeedEl.textContent = "Wind Speed: " + windSpeed + " MPH";
+    
+      var fHumidityEl = document.createElement("p");
+      fHumidityEl.textContent = "Humidity: " + humidity + "%";
+
+    // Create elements for forecast
+    var forecastDateEl = document.createElement("h3");
+    forecastDateEl.textContent = forecastDate;
+
+    var forecastIconEl = document.createElement("img");
+    forecastIconEl.setAttribute("src", forecastIconURL);
+
+    // Append forecast elements
+    var forecastEl = document.createElement("div");
+    forecastEl.appendChild(forecastDateEl);
+    forecastEl.appendChild(forecastIconEl);
+    fiveDayForecast.appendChild(forecastEl);
+  }
+}
+
+// Function call to start the app
+getData()
